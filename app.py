@@ -60,6 +60,10 @@ html_template = """
         <h2>Extracted Text:</h2>
         <p>{{ result }}</p>
     </div>
+    {% else %}
+    <div class="result">
+        <p>No text was extracted. Please try a different image.</p>
+    </div>
     {% endif %}
 </body>
 </html>
@@ -68,21 +72,22 @@ html_template = """
 # Function to handle API calls
 def extract_text_from_image(image_url):
     try:
-        # Fetch the image from the URL
+        print(f"Fetching image from URL: {image_url}")  # Debug log
         response = requests.get(image_url)
         response.raise_for_status()
 
-        # Send the image to the API
+        print("Image fetched successfully, sending to OCR API...")  # Debug log
         files = {'image': ('image.jpg', response.content)}
         headers = {'X-Api-Key': api_key}
         r = requests.post(api_url, files=files, headers=headers)
         r.raise_for_status()
 
-        # Combine all 'text' values
+        print(f"API Response: {r.json()}")  # Debug log
         response_data = r.json()
         combined_text = ''.join([item['text'] for item in response_data])
         return combined_text
     except Exception as e:
+        print(f"Error occurred: {str(e)}")  # Debug log
         return f"Error: {str(e)}"
 
 # Route for the main page
